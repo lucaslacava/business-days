@@ -12,6 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { motion, AnimatePresence } from "framer-motion";
+import useUsdBrlRate from "./lib/useUsdBrlRate";
 
 export default function App() {
   const [startDate, setStartDate] = useState<string>("");
@@ -20,15 +21,7 @@ export default function App() {
   const [businessHours, setBusinessHours] = useState<number | null>(null);
   const [hourlyRate, setHourlyRate] = useState<string>("");
 
-  // useEffect(() => {
-  //   const savedStart = localStorage.getItem("startDate");
-  //   const savedEnd = localStorage.getItem("endDate");
-  //   const savedRate = localStorage.getItem("hourlyRate");
-
-  //   if (savedStart) setStartDate(savedStart);
-  //   if (savedEnd) setEndDate(savedEnd);
-  //   if (savedRate) setHourlyRate(savedRate);
-  // }, []);
+  const { rate: usdBrl, loading } = useUsdBrlRate();
 
   useEffect(() => {
     const savedStart = localStorage.getItem("startDate");
@@ -185,6 +178,38 @@ export default function App() {
                       <p className="text-xl font-bold text-green-400">
                         {formatCurrency(monthlyRate)}
                       </p>
+                    </div>
+                  )}
+                  {businessHours && hourlyRate !== null && (
+                    <div className="mt-2 rounded-lg bg-gray-800/70 p-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <p className="text-md text-gray-300">
+                          Monthly value in
+                        </p>
+                        <p className="text-3xl">🇧🇷</p>
+                      </div>
+                      {!loading && usdBrl && (
+                        <>
+                          <p className="text-xl font-bold text-green-400">
+                            ~ BRL{" "}
+                            {formatCurrency(
+                              businessHours * Number(hourlyRate) * usdBrl
+                            )}
+                            <span className="ml-1 text-sm text-gray-300">
+                              (@{usdBrl.toFixed(2)} BRL/USD)
+                            </span>
+                          </p>
+                          <span className="text-sm text-gray-500">
+                            Yesterday's rate from the{" "}
+                            <a
+                              href="https://dadosabertos.bcb.gov.br/dataset/dolar-americano-usd-todos-os-boletins-diarios/resource/22ab054c-b3ff-4864-82f7-b2815c7a77ec"
+                              className="text-blue-400"
+                            >
+                              BCB
+                            </a>
+                          </span>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
