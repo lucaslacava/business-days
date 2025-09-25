@@ -20,13 +20,44 @@ export default function App() {
   const [businessHours, setBusinessHours] = useState<number | null>(null);
   const [hourlyRate, setHourlyRate] = useState<string>("");
 
+  // useEffect(() => {
+  //   const savedStart = localStorage.getItem("startDate");
+  //   const savedEnd = localStorage.getItem("endDate");
+  //   const savedRate = localStorage.getItem("hourlyRate");
+
+  //   if (savedStart) setStartDate(savedStart);
+  //   if (savedEnd) setEndDate(savedEnd);
+  //   if (savedRate) setHourlyRate(savedRate);
+  // }, []);
+
   useEffect(() => {
     const savedStart = localStorage.getItem("startDate");
     const savedEnd = localStorage.getItem("endDate");
     const savedRate = localStorage.getItem("hourlyRate");
 
-    if (savedStart) setStartDate(savedStart);
-    if (savedEnd) setEndDate(savedEnd);
+    if (savedStart && savedEnd) {
+      const start = new Date(savedStart);
+      const end = new Date(savedEnd);
+
+      const today = new Date();
+
+      // If today is after last saved end, move to next month
+      if (today > end) {
+        const nextStart = new Date(start);
+        nextStart.setMonth(start.getMonth() + 1);
+
+        const nextEnd = new Date(end);
+        nextEnd.setMonth(end.getMonth() + 1);
+
+        setStartDate(nextStart.toISOString().split("T")[0]);
+        setEndDate(nextEnd.toISOString().split("T")[0]);
+      } else {
+        // Otherwise keep last saved
+        setStartDate(savedStart);
+        setEndDate(savedEnd);
+      }
+    }
+
     if (savedRate) setHourlyRate(savedRate);
   }, []);
 
